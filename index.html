@@ -1,295 +1,100 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Digite o nome do carro e consulte o preço oficial na Tabela FIPE utilizando a BrasilAPI.">
-    <title>Consulta Preço de Carros - Tabela FIPE 🚗</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script src="FipeApi.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consulta Tabela FIPE</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <div class="app-wrapper">
-        <!-- Cabeçalho -->
-        <header class="app-header">
-            <div class="header-content">
-                <div class="logo-area">
-                    <div class="logo-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <path
-                                d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
-                            <circle cx="7" cy="17" r="2" />
-                            <path d="M9 17h6" />
-                            <circle cx="17" cy="17" r="2" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h1>Consulta Preço FIPE</h1>
-                        <p class="subtitle">Digite o nome do veículo para consultar o preço via
-                            <strong>BrasilAPI</strong>
-                        </p>
-                    </div>
-                </div>
 
-                <div class="api-badge" title="Consumindo dados oficiais da BrasilAPI">
-                    <span class="status-dot"></span>
-                    <span>BrasilAPI Conectada</span>
-                </div>
-            </div>
-        </header>
+  <header>
+    <h1>Consulta Tabela FIPE</h1>
+    <p>Consulte preços de veículos atualizados.</p>
+  </header>
 
-        <!-- Conteúdo Principal -->
-        <main class="main-content">
-            <!-- Card de Busca -->
-            <section class="card search-card">
-                <div class="card-header">
-                    <h2>Buscar Carro</h2>
-                    <p>Digite o nome do veículo (ex: <em>Gol, Civic, Corolla, Onix, HB20</em>) ou o código FIPE.</p>
-                </div>
+  <main>
+    <!-- MENSAGEM DE ERRO/ALERTA -->
+    <div id="status-error" class="error-box" style="display: none;"></div>
 
-                <form id="fipeForm" class="search-form" autocomplete="off">
-                    <div class="form-group">
-                        <label for="fipeInput">Nome do Veículo ou Código FIPE</label>
-                        <div class="input-wrapper" id="inputWrapper">
-                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                            <input type="text" id="fipeInput" placeholder="Ex: Civic, Gol, Corolla, Onix, HB20..."
-                                required aria-describedby="fipeHelp" spellcheck="false" autocomplete="off" />
-                            <button type="button" id="clearBtn" class="clear-input-btn hidden" title="Limpar campo">
-                                &times;
-                            </button>
-
-                            <!-- Lista de Sugestões / Autocomplete Dropdown -->
-                            <div id="autocompleteDropdown" class="autocomplete-dropdown hidden" role="listbox"
-                                aria-label="Sugestões de veículos"></div>
-                        </div>
-                        <small id="fipeHelp" class="helper-text">Digite o modelo do carro para ver sugestões em tempo
-                            real ou pressione Enter.</small>
-                    </div>
-
-                    <button type="submit" id="searchBtn" class="btn btn-primary">
-                        <span class="btn-text">Consultar Preço</span>
-                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                </form>
-
-                <!-- Atalhos de Veículos Populares -->
-                <div class="quick-shortcuts">
-                    <span class="shortcuts-title">Ou clique em um carro popular para consultar agora:</span>
-                    <div class="chips-container" id="quickChips">
-                        <button type="button" class="chip" data-query="Gol">🚗 VW Gol</button>
-                        <button type="button" class="chip" data-query="Civic">🚗 Honda Civic</button>
-                        <button type="button" class="chip" data-query="Corolla">🚗 Toyota Corolla</button>
-                        <button type="button" class="chip" data-query="Onix">🚗 Chevrolet Onix</button>
-                        <button type="button" class="chip" data-query="HB20">🚗 Hyundai HB20</button>
-                        <button type="button" class="chip" data-query="Palio">🚗 Fiat Palio</button>
-                        <button type="button" class="chip" data-query="Renegade">🚙 Jeep Renegade</button>
-                        <button type="button" class="chip" data-query="Uno">🚗 Fiat Uno</button>
-                        <button type="button" class="chip" data-query="Hilux">🛻 Toyota Hilux</button>
-                        <button type="button" class="chip" data-query="Compass">🚙 Jeep Compass</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ELEMENTO OBRIGATÓRIO: Indicador de Processamento / Loading -->
-            <section id="loadingIndicator" class="loading-container hidden" role="status" aria-live="polite"
-                aria-busy="true">
-                <div class="spinner-wrapper">
-                    <div class="spinner"></div>
-                    <div class="spinner-pulse"></div>
-                </div>
-                <div class="loading-info">
-                    <h3 class="loading-title">Consultando Tabela FIPE...</h3>
-                    <p class="loading-desc">Conectando aos servidores da <strong>BrasilAPI</strong> para buscar os
-                        preços</p>
-                </div>
-                <div class="loading-bar">
-                    <div class="loading-progress"></div>
-                </div>
-            </section>
-
-            <!-- Mensagem de Erro -->
-            <section id="errorCard" class="card error-card hidden" role="alert">
-                <div class="error-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                </div>
-                <div class="error-content">
-                    <h3 id="errorTitle">Veículo não encontrado</h3>
-                    <p id="errorMessage">Não foi possível localizar dados para o veículo informado. Tente digitar o nome
-                        de outro carro ou selecione uma das sugestões.</p>
-                </div>
-                <button type="button" id="dismissErrorBtn" class="error-close-btn"
-                    aria-label="Fechar mensagem">&times;</button>
-            </section>
-
-            <!-- Card de Resultados -->
-            <section id="resultsSection" class="results-wrapper hidden">
-                <!-- Destaque Principal -->
-                <article class="card result-card">
-                    <div class="result-header">
-                        <div class="vehicle-title-area">
-                            <span class="brand-pill" id="resMarca">Marca</span>
-                            <h2 id="resModelo" class="vehicle-model">Modelo do Veículo</h2>
-                            <div class="meta-tags">
-                                <span class="meta-tag">
-                                    <strong>Código FIPE:</strong> <span id="resCodigoFipe">---</span>
-                                </span>
-                                <span class="meta-tag">
-                                    <strong>Referência:</strong> <span id="resMesRef">---</span>
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Preço em Destaque -->
-                        <div class="price-highlight-box">
-                            <span class="price-label">Preço Médio FIPE</span>
-                            <div class="price-value-container">
-                                <span id="resValor" class="price-value">R$ 0,00</span>
-                                <button type="button" id="copyPriceBtn" class="copy-btn" title="Copiar valor">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                    </svg>
-                                    <span class="copy-tooltip">Copiado!</span>
-                                </button>
-                            </div>
-                            <span class="price-sub">Valor de referência de mercado</span>
-                        </div>
-                    </div>
-
-                    <!-- Seletor de Ano do Modelo -->
-                    <div class="year-selector-area">
-                        <div class="selector-header">
-                            <label for="yearSelect"><strong>Selecione o Ano/Combustível:</strong></label>
-                            <span class="available-years-badge" id="availableYearsCount">0 versões</span>
-                        </div>
-                        <select id="yearSelect" class="form-select" aria-label="Selecione o ano do modelo"></select>
-                    </div>
-
-                    <!-- Detalhes do Veículo Selecionado -->
-                    <div class="vehicle-specs-grid">
-                        <div class="spec-item">
-                            <div class="spec-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                            </div>
-                            <div>
-                                <span class="spec-label">Ano Modelo</span>
-                                <strong class="spec-val" id="resAnoModelo">---</strong>
-                            </div>
-                        </div>
-
-                        <div class="spec-item">
-                            <div class="spec-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 22V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"></path>
-                                    <path d="M15 11h4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-4"></path>
-                                    <circle cx="9" cy="10" r="2"></circle>
-                                </svg>
-                            </div>
-                            <div>
-                                <span class="spec-label">Combustível</span>
-                                <strong class="spec-val" id="resCombustivel">---</strong>
-                            </div>
-                        </div>
-
-                        <div class="spec-item">
-                            <div class="spec-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <polyline points="12 6 12 12 16 14"></polyline>
-                                </svg>
-                            </div>
-                            <div>
-                                <span class="spec-label">Data da Consulta</span>
-                                <strong class="spec-val" id="resDataConsulta">---</strong>
-                            </div>
-                        </div>
-
-                        <div class="spec-item">
-                            <div class="spec-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <span class="spec-label">Sigla Combustível</span>
-                                <strong class="spec-val" id="resSiglaCombustivel">---</strong>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- Tabela com Todas as Versões/Anos Disponíveis -->
-                <article class="card table-card">
-                    <div class="card-header">
-                        <h3>Histórico de Cotações por Ano</h3>
-                        <p>Todos os anos/versões disponíveis para este veículo na Tabela FIPE</p>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="fipe-table">
-                            <thead>
-                                <tr>
-                                    <th>Ano Modelo</th>
-                                    <th>Combustível</th>
-                                    <th>Mês Ref.</th>
-                                    <th class="text-right">Valor FIPE</th>
-                                    <th class="text-center">Ação</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody">
-                                <!-- Linhas inseridas via JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </article>
-            </section>
-
-            <!-- Histórico de Consultas Recentes -->
-            <section id="recentSearchesSection" class="card recent-card hidden">
-                <div class="recent-header">
-                    <div class="recent-title-area">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="recent-icon">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 14 14"></polyline>
-                        </svg>
-                        <h3>Consultas Recentes</h3>
-                    </div>
-                    <button type="button" id="clearHistoryBtn" class="btn-text-sm">Limpar histórico</button>
-                </div>
-                <div id="recentList" class="recent-list">
-                    <!-- Itens recentes adicionados via JS -->
-                </div>
-            </section>
-        </main>
-
-        <!-- Rodapé -->
-        <footer class="app-footer">
-            <p>Dados fornecidos em tempo real através da <a href="https://brasilapi.com.br/" target="_blank"
-                    rel="noopener noreferrer">BrasilAPI</a> • Tabela FIPE Oficial</p>
-        </footer>
+    <!-- INDICADOR DE PROCESSAMENTO -->
+    <div id="loading-indicator" class="loading-box" style="display: none;">
+      ⏳ Processando requisição... Aguarde.
     </div>
-</body>
 
+    <!-- MODO DE BUSCA POR NAVEGAÇÃO -->
+    <section class="card">
+      <h2>1. Seleção Sequencial</h2>
+      
+      <div class="form-group">
+        <label for="select-tipo">Tipo de Veículo:</label>
+        <select id="select-tipo">
+          <option value="carros">Carros</option>
+          <option value="motos">Motos</option>
+          <option value="caminhoes">Caminhões</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="select-marca">Marca:</label>
+        <select id="select-marca">
+          <option value="">-- Carregando Marcas... --</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="select-modelo">Modelo:</label>
+        <select id="select-modelo" disabled>
+          <option value="">-- Selecione a Marca Primeiro --</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="select-ano">Ano / Combustível:</label>
+        <select id="select-ano" disabled>
+          <option value="">-- Selecione o Modelo Primeiro --</option>
+        </select>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- MODO DE BUSCA DIRETA POR CÓDIGO FIPE -->
+    <section class="card">
+      <h2>2. Busca Direta por Código FIPE</h2>
+      <div class="form-group">
+        <label for="input-fipe">Código FIPE (ex: 004001-0):</label>
+        <input type="text" id="input-fipe" placeholder="Digite o código FIPE...">
+      </div>
+      <button type="button" id="btn-buscar-fipe">Buscar por Código</button>
+    </section>
+
+    <!-- RESULTADO DA CONSULTA -->
+    <section id="result-container" class="card result-box" style="display: none;">
+      <h2>Resultado da Consulta</h2>
+      <p><strong>Veículo:</strong> <span id="res-modelo">-</span></p>
+      <p><strong>Marca:</strong> <span id="res-marca">-</span></p>
+      <p><strong>Ano Modelo:</strong> <span id="res-ano">-</span></p>
+      <p><strong>Combustível:</strong> <span id="res-combustivel">-</span></p>
+      <p><strong>Código FIPE:</strong> <span id="res-codigo">-</span></p>
+      <p><strong>Mês de Referência:</strong> <span id="res-referencia">-</span></p>
+      <p class="preco-destaque"><strong>Preço Médio:</strong> <span id="res-valor">R$ 0,00</span></p>
+    </section>
+
+    <!-- HISTÓRICO LOCAL DE BUSCAS -->
+    <section class="card">
+      <h2>Histórico de Consultas Recentes</h2>
+      <ul id="historico-list">
+        <li>Nenhuma consulta realizada ainda.</li>
+      </ul>
+      <button type="button" id="btn-limpar-historico">Limpar Histórico</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>API utilizada: Tabela FIPE (Parallelum).</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
 </html>
